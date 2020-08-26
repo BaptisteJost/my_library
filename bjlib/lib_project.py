@@ -2,7 +2,6 @@
 import numpy as np
 import healpy as hp
 import camb
-import lib_project as lib
 from astropy import units as u
 import pysm
 import copy
@@ -337,7 +336,7 @@ def get_fisher_dict(spectra_dict, angle_array, w_inv, beam_array,
         beam_array = [beam_array]
     if fisher_dict == {}:
         for key_rot in angle_array:
-            fisher, fisher_element = lib.fisher_angle(
+            fisher, fisher_element = fisher_angle(
                 spectra_dict[(0*u.deg, 'unlensed')],
                 key_rot, cl_rot=spectra_dict[(key_rot, 'unlensed')],
                 return_elements=True)
@@ -345,7 +344,7 @@ def get_fisher_dict(spectra_dict, angle_array, w_inv, beam_array,
 
     for key_rot in angle_array:
         for k in beam_array:
-            fisher, fisher_element = lib.fisher_angle(
+            fisher, fisher_element = fisher_angle(
                 spectra_dict[(0*u.deg, 'unlensed')], key_rot,
                 cl_rot=spectra_dict[(key_rot, (w_inv, k*u.arcmin))],
                 return_elements=True)
@@ -353,7 +352,7 @@ def get_fisher_dict(spectra_dict, angle_array, w_inv, beam_array,
     if lensing:
         for key_rot in angle_array:
             for k in beam_array:
-                fisher, fisher_element = lib.fisher_angle(
+                fisher, fisher_element = fisher_angle(
                     spectra_dict[(0*u.deg, 'unlensed')], key_rot,
                     cl_rot=spectra_dict[(key_rot, (w_inv, k*u.arcmin))],
                     return_elements=True)
@@ -362,7 +361,7 @@ def get_fisher_dict(spectra_dict, angle_array, w_inv, beam_array,
     if foregrounds:
         for key_rot in angle_array:
             for k in beam_array:
-                fisher, fisher_element = lib.fisher_angle(
+                fisher, fisher_element = fisher_angle(
                     spectra_dict[(0*u.deg, 'unlensed')], key_rot,
                     cl_rot=spectra_dict[((key_rot, (w_inv, k*u.arcmin)),
                                          'foregrounds')], return_elements=True)
@@ -406,16 +405,16 @@ def get_truncated_fisher_dict(spectra_dict, angle_array, w_inv, beam_array,
     if fisher_trunc_array_dict == {}:
         for key_rot in angle_array:
             truncated_fisher_array, truncated_fisher_element_array = \
-                lib.truncated_fisher_angle(spectra_dict[0*u.deg], key_rot,
-                                           cl_rot_noise=spectra_dict[key_rot],
-                                           return_elements=True)
+                truncated_fisher_angle(spectra_dict[0*u.deg], key_rot,
+                                       cl_rot_noise=spectra_dict[key_rot],
+                                       return_elements=True)
             fisher_trunc_array_dict[(key_rot, 'no noise')] = \
                 truncated_fisher_element_array
 
     for key_rot in angle_array:
         for k in beam_array:
             truncated_fisher_array, truncated_fisher_element_array = \
-                lib.truncated_fisher_angle(
+                truncated_fisher_angle(
                     spectra_dict[0*u.deg], key_rot,
                     cl_rot_noise=spectra_dict[(key_rot, (w_inv, k*u.arcmin))],
                     return_elements=True)
@@ -426,7 +425,7 @@ def get_truncated_fisher_dict(spectra_dict, angle_array, w_inv, beam_array,
         for key_rot in angle_array:
             for k in beam_array:
                 truncated_fisher_array, truncated_fisher_element_array = \
-                    lib.truncated_fisher_angle(
+                    truncated_fisher_angle(
                         spectra_dict[0*u.deg], key_rot,
                         cl_rot_noise=spectra_dict[
                             ((key_rot, (w_inv, k*u.arcmin)), 'foregrounds')],
