@@ -3,7 +3,7 @@ from scipy.linalg import logm
 import IPython
 # import sys
 # sys.path.insert(1, '/home/baptiste/Documents/stage_npac')
-import lib_project as lib
+import bjlib.lib_project as lib
 import plot_project as plotpro
 # import math
 from fgbuster import visualization as visu
