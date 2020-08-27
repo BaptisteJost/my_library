@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 import numpy as np
-import lib_project as lib
+import bjlib.lib_project as lib
 from matplotlib import cm
 from numpy import inf
 import matplotlib.ticker as mticker

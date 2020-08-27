@@ -13,7 +13,7 @@ from astropy import units as u
 import matplotlib.pyplot as plt
 # import healpy as hp
 import numpy as np
-import V3calc as V3
+import bjlib.V3calc as V3
 import copy
 import time
 # << << << < HEAD

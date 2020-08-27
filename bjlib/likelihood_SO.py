@@ -1,13 +1,13 @@
-from mpl_toolkits import mplot3d
-from matplotlib import cm
+# from mpl_toolkits import mplot3d
+# from matplotlib import cm
 import matplotlib.pyplot as plt
 import time
-from pandas import DataFrame as df
+# from pandas import DataFrame as df
 import IPython
 from astropy import units as u
 import numpy as np
 
-import lib_project as lib
+import bjlib.lib_project as lib
 from scipy.optimize import minimize
 
 import healpy as hp
@@ -16,8 +16,8 @@ from fgbuster.component_model import CMB, Dust, Synchrotron
 from scipy.linalg import block_diag
 from fgbuster.observation_helpers import get_sky
 import pysm
-import V3calc as V3
-from fgbuster import visualization as visu
+import bjlib.V3calc as V3
+# from fgbuster import visualization as visu
 
 
 class sky_map:
