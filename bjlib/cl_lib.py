@@ -9,7 +9,7 @@ import pymaster as nmt
 from astropy import units as u
 from scipy.optimize import minimize
 import numdifftools as nd
-import mk_noise_map2 as mknm
+import bjlib.mk_noise_map2 as mknm
 
 
 def binning_definition(nside, lmin=2, lmax=200, nlb=[], custom_bins=False):
