@@ -7,7 +7,7 @@ import pysm
 import copy
 from fgbuster import MixingMatrix
 from fgbuster.component_model import CMB, Dust, Synchrotron
-import V3calc as V3
+from . import V3calc as V3
 
 
 def get_basics(l_max=5000, raw_cl=False, lens_potential=False, ratio=0.07):
