@@ -1,2 +1,2 @@
 __all__ = ['class_faraday', 'lib_project', 'likelihood_SO', 'plot_project',
-           'V3calc']
+           'V3calc', 'cl_lib']
