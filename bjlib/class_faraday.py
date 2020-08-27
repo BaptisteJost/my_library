@@ -4,14 +4,14 @@ import IPython
 # import sys
 # sys.path.insert(1, '/home/baptiste/Documents/stage_npac')
 import bjlib.lib_project as lib
-import plot_project as plotpro
+# import plot_project as plotpro
 # import math
 from fgbuster import visualization as visu
 
 from astropy import constants as c
 from astropy import units as u
 import matplotlib.pyplot as plt
-import healpy as hp
+# import healpy as hp
 import numpy as np
 import V3calc as V3
 import copy
