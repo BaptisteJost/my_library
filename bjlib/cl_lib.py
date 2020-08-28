@@ -44,6 +44,30 @@ def compute_master(f_a, f_b, wsp):
 
 
 def error_68(x_grid, y_grid, x_max_likelihood=0):
+    """Evaluates the boundaries of the integral of a function such as it is
+    equal to 68% of the total integral. error_68() then returns the value of
+    boundarie which can then be interpreted as a 1sigma error. Warning the
+    function must be symmetric arround a point x_max_likelihood.
+
+    Parameters
+    ----------
+    x_grid : 1D numpy array
+        Points along the x axis along which the function is evaluated.
+    y_grid : 1D numpy array
+        Values of the function corresponding to the points in the x_grid.
+    x_max_likelihood : float
+        Position of the maximum of the likelihood around which the boundaries
+        will be centered.
+
+    Returns
+    -------
+    float
+        Position on the x axis of the upper boundary of the integral such that
+        integral of the function from x = - error + x_max_likelihood to
+        x = + error + x_max_likelihood equals 0.68 of the total integral.
+        aka 1 sigma error.
+
+    """
 
     total_integral = np.trapz(y_grid, x=x_grid)
     if np.isnan(total_integral):
