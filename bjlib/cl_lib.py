@@ -395,8 +395,8 @@ def get_nsim_freq_cl_mpi(input_map, nsim, frequencies_index, mask, mask_apo,
     # comm = MPI.COMM_WORLD
     # rank = comm.Get_rank()
     # size = comm.Get_size()
-    print('SIZE = ', size)
-    print('nside =', nsim)
+    # print('SIZE = ', size)
+    # print('nside =', nsim)
     # root = 0
     Cl_freq = []
     for f in range(len(frequencies_index)):
