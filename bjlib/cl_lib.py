@@ -10,6 +10,7 @@ from astropy import units as u
 from scipy.optimize import minimize
 import numdifftools as nd
 import bjlib.mk_noise_map2 as mknm
+from mpi4py import MPI
 
 
 def binning_definition(nside, lmin=2, lmax=200, nlb=[], custom_bins=False):
@@ -391,9 +392,9 @@ def get_nsim_freq_cl_mpi(input_map, nsim, frequencies_index, mask, mask_apo,
                          purify_e, purify_b, wsp):
 
     # Cl_nsim_freq = []
-    comm = MPI.COMM_WORLD
+    # comm = MPI.COMM_WORLD
     # rank = comm.Get_rank()
-    size = comm.Get_size()
+    # size = comm.Get_size()
     print('SIZE = ', size)
     print('nside =', nsim)
     # root = 0
