@@ -481,7 +481,7 @@ def likelihood_pws(model, data, f_sky=0.1, ell=None, return_elements=False):
 
 def likelihood_for_hessian_a(angle, model_, data_matrix, bin, nside, f_sky, spectra_used='all'):
     angle = angle * u.rad
-    print('angle likelihood = ', angle)
+    # print('angle likelihood = ', angle)
     # r = param_array[1]
     # IPython.embed()
     # model.get_spectra(r=r)
