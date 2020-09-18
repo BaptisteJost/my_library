@@ -96,7 +96,7 @@ def error_68(x_grid, y_grid, x_max_likelihood=0):
 
 
 def L_gridding(spectra_model, data_matrix, alpha_grid,
-               bin, nside, f_sky_SAT, spectra_used='all'):
+               bin, nside, f_sky_SAT, spectra_used='all', return_m2logL=False):
 
     grid_logL = []
     # grid_model_matrix = []
@@ -124,6 +124,8 @@ def L_gridding(spectra_model, data_matrix, alpha_grid,
     in_exp = -np.array(grid_logL) - max_logL  # max(-np.array(grid_logL))
 
     # , np.array(grid_model_matrix), np.array(grid_data_matrix), np.array(grid_Cm1D), np.array(likelihood_element_grid), (grid_alpha2, np.exp(in_exp_2))
+    if return_m2logL:
+        return np.exp(in_exp), grid_logL
     return np.exp(in_exp)
 
 

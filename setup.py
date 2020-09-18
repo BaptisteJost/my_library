@@ -7,7 +7,7 @@ setup(
     author_email='jost@apc.in2p3.fr',
     packages=['bjlib'],
     install_requires=['numpy', 'healpy', 'pysm'],
-    version='0.0.2.13',
+    version='0.0.2.14',
     license='MIT',
     description='My personal library',
 )
