@@ -383,6 +383,10 @@ def fisher_pws(cov, deriv, f_sky, ell=None, cov2=None, deriv2=None, return_eleme
 
 
 def likelihood_pws(model, data, f_sky=0.1, ell=None, return_elements=False):
+    '''
+    return -log(L) not -2log(L) no need to devide by 2 !
+    '''
+
     if ell is None:
         ell_inter = np.intersect1d(model.ell, data.ell)
     else:

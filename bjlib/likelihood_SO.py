@@ -80,6 +80,11 @@ class sky_map:
         if self.instrument == 'LAT':
             print(self.instrument)
             self.frequencies = V3.so_V3_LA_bands()
+        if self.instrument == 'LiteBIRD':
+            print(self.instrument)
+            self.frequencies = np.array([40.0, 50.0, 60.0, 68.4, 78.0, 88.5,
+                                         100.0, 118.9, 140.0, 166.0, 195.0,
+                                         234.9, 280.0, 337.4, 402.1])
 
     def get_freq_maps(self, output=0):
         cmb_freq_maps = self.sky.cmb(sky_map.cmb_freq) * \
@@ -293,6 +298,10 @@ class sky_map:
                 (white_noise / hp.nside2resol(self.nside, arcmin=True))**2)
             inv_noise = np.diag(1 / (white_noise / hp.nside2resol(
                 self.nside, arcmin=True))**2)
+
+        if self.instrument == 'LiteBIRD':
+            sensitivity = np.array([37.5, 24.0, 19.9, 16.2, 13.5, 11.7, 9.2,
+                                    7.6, 5.9, 6.5, 5.8, 7.7, 13.2, 19.5, 37.5])
 
         self.noise_covariance = noise_covariance
         self.inv_noise = inv_noise
