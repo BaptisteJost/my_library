@@ -320,7 +320,7 @@ class power_spectra_operation:
 def fisher_pws(cov, deriv, f_sky, ell=None, cov2=None, deriv2=None, return_elements=False):
     if np.any(ell == 0) or np.any(ell == 1):
         print('ERROR: 0th or first multipole can be used in fisher')
-        return
+        return np.nan
     if cov2 is None:
         cov2 = cov
     if deriv2 is None:
@@ -332,8 +332,9 @@ def fisher_pws(cov, deriv, f_sky, ell=None, cov2=None, deriv2=None, return_eleme
     else:
         ell_inter = ell
     if sum(ell_inter == 0) or sum(ell_inter == 1):
-        print('WARNING: in fisher_pws() ell = 0 or 1 are present which could',
-              ' lead to a wrong Fisher estimation')
+        print('ERROR: in fisher_pws() ell = 0 or 1 are present which could',
+              ' lead to a wrong Fisher estimation, nan returned')
+        return np.nan
 
     cov1_index = [cov.ell.tolist().index(element) for element in ell_inter]
     cov2_index = [cov2.ell.tolist().index(element) for element in ell_inter]

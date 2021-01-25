@@ -59,7 +59,7 @@ class sky_map:
         if type(new_angle) == u.quantity.Quantity:
             new_angle_rad = new_angle.to(u.rad)
         else:
-            print('no unit has be given for new angle, radian is assumed')
+            # print('no unit has be given for new angle, radian is assumed')
             new_angle_rad = new_angle * u.rad
         self._bir_angle = new_angle_rad
 
@@ -156,8 +156,35 @@ class sky_map:
         if output:
             return signal
 
-    def get_mixing_matrix(self):
+    def get_A_ev(self):
+        components = [CMB(), Dust(sky_map.dust_freq),
+                      Synchrotron(sky_map.synchrotron_freq)]
+        A = MixingMatrix(*components)
+        A_ev = A.evaluator(self.frequencies)
+        self.A_ev = A_ev
 
+    def evaluate_mixing_matrix(self, spectral_indices=[1.59, 20, -3]):
+        A_ = self.A_ev(spectral_indices)
+        self.A_ = A_
+        self.spectral_indices = spectral_indices
+        if self.instrument == 'SAT':
+            mixing_matrix = np.repeat(A_, 2, 0)
+        else:
+            print('Only SAT supported for mxing matrix for now')
+
+        mixing_matrix = np.repeat(mixing_matrix, 2, 1)
+
+        for i in range(np.shape(mixing_matrix)[0]):
+            for j in range(np.shape(mixing_matrix)[1]):
+                mixing_matrix[i, j] = mixing_matrix[i, j] *\
+                    (((i % 2)-(1-j % 2)) % 2)
+
+        self.mixing_matrix = mixing_matrix
+
+    def get_mixing_matrix(self):
+        self.get_A_ev()
+        self.evaluate_mixing_matrix()
+        '''
         components = [CMB(), Dust(sky_map.dust_freq),
                       Synchrotron(sky_map.synchrotron_freq)]
         A = MixingMatrix(*components)
@@ -183,6 +210,7 @@ class sky_map:
                     (((i % 2)-(1-j % 2)) % 2)
 
         self.mixing_matrix = mixing_matrix
+        '''
 
     def get_miscalibration_angle_matrix(self):
         miscal_matrix = 1
@@ -392,14 +420,15 @@ class sky_map:
 def get_chi_squared(angle_array, data_skm, model_skm, prior=False):
 
     # print('SHAPE ddt=', np.shape(ddt))
-    model_skm.miscal_angles = [angle_array[0], angle_array[1],
-                               angle_array[2]]  # , angle_array[1], 0]
+    # model_skm.miscal_angles = [angle_array[0], angle_array[1],
+    #                            angle_array[2], angle_array[3], angle_array[4], angle_array[5]]  # , angle_array[1], 0]
     # model_skm.frequencies_by_instrument = [6, 0, 0]
+    model_skm.miscal_angles = [1, 2, angle_array[0]]
 
     model_skm.bir_angle = 0  # angle_array[1]
 
     model_skm.get_miscalibration_angle_matrix()
-    # model_skm.cmb_rotation()
+    model_skm.cmb_rotation()
 
     if prior:
         # model_skm.from_pysm2data()
@@ -448,14 +477,20 @@ def get_chi_squared(angle_array, data_skm, model_skm, prior=False):
         # in_sum = -np.absolute(in_sum_)
         # in_sum = in_sum_
     else:
-        d = np.dot(data_skm.mix_effectiv, data_skm.signal)
+        # d = np.dot(data_skm.mix_effectiv, data_skm.signal)
+        d = data_skm.data
+
         ddt = np.einsum('ik...,...kj->ijk', d, d.T)
     # model_skm.get_mixing_matrix()
         model_skm.get_projection_op()
     # print(df(model_skm.projection))
+        #
+        # first_term = data_skm.inv_noise - model_skm.projection
+        # second_term = np.array([data_skm.noise_covariance + ddt[:, :, i]
+        #                         for i in range(len(ddt[0, 0, :]))]).T
 
-        first_term = data_skm.inv_noise - model_skm.projection
-        second_term = np.array([data_skm.noise_covariance + ddt[:, :, i]
+        first_term = model_skm.inv_noise - model_skm.projection
+        second_term = np.array([model_skm.noise_covariance + ddt[:, :, i]
                                 for i in range(len(ddt[0, 0, :]))]).T
 
         in_sum = np.einsum('ij,jk...l->ikl', first_term, second_term)
