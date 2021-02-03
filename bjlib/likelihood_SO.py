@@ -102,14 +102,24 @@ class sky_map:
     def cmb_rotation(self, output=0):
         cmb_freq_rot = lib.map_rotation(self.cmb_freq_maps, self.bir_angle)
         self.cmb_freq_rot = cmb_freq_rot
+        # Updating birefringence matrix
+        self.get_bir_matrix()
+        # rotation_block = np.array(
+        #     [[np.cos(2*self.bir_angle),  np.sin(2*self.bir_angle)],
+        #      [-np.sin(2*self.bir_angle), np.cos(2*self.bir_angle)]
+        #      ])
+        # bir_matrix = block_diag(rotation_block, np.eye(4))
+        # self.bir_matrix = bir_matrix
+        if output:
+            return cmb_freq_rot
+
+    def get_bir_matrix(self):
         rotation_block = np.array(
             [[np.cos(2*self.bir_angle),  np.sin(2*self.bir_angle)],
              [-np.sin(2*self.bir_angle), np.cos(2*self.bir_angle)]
              ])
         bir_matrix = block_diag(rotation_block, np.eye(4))
         self.bir_matrix = bir_matrix
-        if output:
-            return cmb_freq_rot
 
     def faraday_rotation(self, output=0):
 
@@ -379,27 +389,28 @@ class sky_map:
         mix_T = mix_effectiv.T
 
         if prior:
-            ATNA = np.einsum('ij,kjl,lm->kim', mix_T, self.inv_noise_ell,
-                             mix_effectiv)
-            inverse = np.linalg.inv(ATNA + self.prior_cov_inv[2:])
-            self.inverse = inverse
-            # inverse = np.array([np.zeros(6, 6), np.zeros(6, 6)].append(inverse_))
-
-            ATN = np.einsum('ij,kjm->kim', mix_T, self.inv_noise_ell)
-            self.ATN = ATN
-            # print('SHAPE ATN = ', np.shape(ATN))
-            IATN = np.einsum('kij,kjl->kil', inverse, ATN)
-            # print('SHAPE IATN = ', np.shape(IATN))
-            NA = np.dot(self.inv_noise_ell, mix_effectiv)
-            # print('SHAPE NA = ', np.shape(NA))
-
-            proj_nonoise = np.einsum('kij,kjl->kil', NA, IATN)
-            # print('SHAPE proj_nonoise = ', np.shape(proj_nonoise))
-
-            projection = self.inv_noise_ell - proj_nonoise
-            # print('SHAPE projection = ', np.shape(projection))
-
-            # np.dot(inverse, ATN)
+            print('Prior option in get_projection_op() no longer supported')
+            # ATNA = np.einsum('ij,kjl,lm->kim', mix_T, self.inv_noise_ell,
+            #                  mix_effectiv)
+            # inverse = np.linalg.inv(ATNA + self.prior_cov_inv[2:])
+            # self.inverse = inverse
+            # # inverse = np.array([np.zeros(6, 6), np.zeros(6, 6)].append(inverse_))
+            #
+            # ATN = np.einsum('ij,kjm->kim', mix_T, self.inv_noise_ell)
+            # self.ATN = ATN
+            # # print('SHAPE ATN = ', np.shape(ATN))
+            # IATN = np.einsum('kij,kjl->kil', inverse, ATN)
+            # # print('SHAPE IATN = ', np.shape(IATN))
+            # NA = np.dot(self.inv_noise_ell, mix_effectiv)
+            # # print('SHAPE NA = ', np.shape(NA))
+            #
+            # proj_nonoise = np.einsum('kij,kjl->kil', NA, IATN)
+            # # print('SHAPE proj_nonoise = ', np.shape(proj_nonoise))
+            #
+            # projection = self.inv_noise_ell - proj_nonoise
+            # # print('SHAPE projection = ', np.shape(projection))
+            #
+            # # np.dot(inverse, ATN)
 
         else:
             inverse = np.linalg.inv(
@@ -416,7 +427,7 @@ class sky_map:
 
         self.projection = projection
 
-    def get_mask(self, path = '/global/homes/j/jost/BBPipe' ):
+    def get_mask(self, path='/global/homes/j/jost/BBPipe'):
         if self.instrument == 'SAT':
             # BBPipe_path = '/global/homes/j/jost/BBPipe'
             # BBPipe_path = '/home/baptiste/BBPipe'
