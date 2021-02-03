@@ -416,6 +416,18 @@ class sky_map:
 
         self.projection = projection
 
+    def get_mask(self, path = '/global/homes/j/jost/BBPipe' ):
+        if self.instrument == 'SAT':
+            # BBPipe_path = '/global/homes/j/jost/BBPipe'
+            # BBPipe_path = '/home/baptiste/BBPipe'
+            mask_ = hp.read_map(path +
+                                "/test_mapbased_param/norm_nHits_SA_35FOV_G_nside512_binary.fits")
+            mask = hp.ud_grade(mask_, self.nside)
+            del mask_
+            self.mask = mask
+        else:
+            print('Only SAT mask supported for now')
+
 
 def get_chi_squared(angle_array, data_skm, model_skm, prior=False):
 
