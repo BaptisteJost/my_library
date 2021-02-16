@@ -170,6 +170,7 @@ class sky_map:
         components = [CMB(), Dust(sky_map.dust_freq),
                       Synchrotron(sky_map.synchrotron_freq)]
         A = MixingMatrix(*components)
+        self.A = A
         A_ev = A.evaluator(self.frequencies)
         self.A_ev = A_ev
 
