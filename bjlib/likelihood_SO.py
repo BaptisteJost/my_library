@@ -432,8 +432,10 @@ class sky_map:
         if self.instrument == 'SAT':
             # BBPipe_path = '/global/homes/j/jost/BBPipe'
             # BBPipe_path = '/home/baptiste/BBPipe'
+            # mask_ = hp.read_map(path +
+            #                     "/test_mapbased_param/norm_nHits_SA_35FOV_G_nside512_binary.fits")
             mask_ = hp.read_map(path +
-                                "/test_mapbased_param/norm_nHits_SA_35FOV_G_nside512_binary.fits")
+                                "/test_mapbased_param/mask_04000.fits")
             mask = hp.ud_grade(mask_, self.nside)
             del mask_
             self.mask = mask
