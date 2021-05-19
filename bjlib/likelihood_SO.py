@@ -172,6 +172,7 @@ class sky_map:
             components = [CMB(), Dust(sky_map.dust_freq),
                           Synchrotron(sky_map.synchrotron_freq)]
         else:
+            print('fix temp in get_A_ev')
             components = [CMB(), Dust(sky_map.dust_freq, temp=20),
                           Synchrotron(sky_map.synchrotron_freq)]
         A = MixingMatrix(*components)
@@ -183,8 +184,9 @@ class sky_map:
         if not self.fix_temp:
             self.spectral_indices = spectral_indices
         else:
+            print('fix temp in evaluate_mixing_matrix')
             self.spectral_indices = spectral_indices[::2]
-        A_ = self.A_ev(spectral_indices)
+        A_ = self.A_ev(self.spectral_indices)
         self.A_ = A_
         if self.instrument == 'SAT':
             mixing_matrix = np.repeat(A_, 2, 0)
