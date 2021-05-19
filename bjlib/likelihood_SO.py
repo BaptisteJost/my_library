@@ -166,18 +166,26 @@ class sky_map:
         if output:
             return signal
 
-    def get_A_ev(self):
-        components = [CMB(), Dust(sky_map.dust_freq),
-                      Synchrotron(sky_map.synchrotron_freq)]
+    def get_A_ev(self, fix_temp=False):
+        self.fix_temp = fix_temp
+        if not self.fix_temp:
+            components = [CMB(), Dust(sky_map.dust_freq),
+                          Synchrotron(sky_map.synchrotron_freq)]
+        else:
+            components = [CMB(), Dust(sky_map.dust_freq, temp=20),
+                          Synchrotron(sky_map.synchrotron_freq)]
         A = MixingMatrix(*components)
         self.A = A
         A_ev = A.evaluator(self.frequencies)
         self.A_ev = A_ev
 
     def evaluate_mixing_matrix(self, spectral_indices=[1.59, 20, -3]):
+        if not self.fix_temp:
+            self.spectral_indices = spectral_indices
+        else:
+            self.spectral_indices = spectral_indices[::2]
         A_ = self.A_ev(spectral_indices)
         self.A_ = A_
-        self.spectral_indices = spectral_indices
         if self.instrument == 'SAT':
             mixing_matrix = np.repeat(A_, 2, 0)
         else:
