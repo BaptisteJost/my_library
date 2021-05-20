@@ -330,8 +330,8 @@ class sky_map:
             #
             noise_covariance = np.diag(
                 (white_noise / hp.nside2resol(self.nside, arcmin=True))**2)
-            inv_noise = np.diag(1 / ((white_noise / hp.nside2resol(
-                self.nside, arcmin=True))**2))
+            inv_noise = np.diag((hp.nside2resol(
+                self.nside, arcmin=True)/white_noise)**2)
 
             noise_N_ell = np.repeat(
                 V3.so_V3_SA_noise(2, 2, 1, 0.1, self.nside*3)[1],
