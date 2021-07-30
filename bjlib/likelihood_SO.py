@@ -184,7 +184,7 @@ class sky_map:
         if not self.fix_temp:
             self.spectral_indices = spectral_indices
         else:
-            print('fix temp in evaluate_mixing_matrix')
+            # print('fix temp in evaluate_mixing_matrix')
             self.spectral_indices = spectral_indices[::2]
         A_ = self.A_ev(self.spectral_indices)
         self.A_ = A_
@@ -317,24 +317,24 @@ class sky_map:
                                                lens_potential=False, ratio=0)
         self.prim = powers['total'][:self.nside*3]
 
-    def get_noise(self):
+    def get_noise(self, sensitiviy_mode=2, one_over_f_mode=2):
         # TODO: put SAT and LAT caracteristics in class atributes
         if self.instrument == 'SAT':
             print('SAT white noise')
             # noise_covariance = np.eye(12)
             # inv_noise = np.eye(12)
-            white_noise = np.repeat(V3.so_V3_SA_noise(2, 2, 1, 0.1,
+            white_noise = np.repeat(V3.so_V3_SA_noise(sensitiviy_mode, one_over_f_mode, 1, 0.1,
                                                       self.nside*3)[2],
                                     2, 0)
-            # self.white_noise = white_noise
-            #
+
             noise_covariance = np.diag(
                 (white_noise / hp.nside2resol(self.nside, arcmin=True))**2)
             inv_noise = np.diag((hp.nside2resol(
                 self.nside, arcmin=True)/white_noise)**2)
 
             noise_N_ell = np.repeat(
-                V3.so_V3_SA_noise(2, 2, 1, 0.1, self.nside*3)[1],
+                V3.so_V3_SA_noise(sensitiviy_mode, one_over_f_mode, 1, 0.1,
+                                  self.nside*3, beam_corrected=True)[1],
                 2, 0)
             ells = np.shape(noise_N_ell)[-1]
             noise_cov_ell = [np.diag(noise_N_ell[:, k]) for k in range(ells)]
@@ -447,7 +447,9 @@ class sky_map:
             mask_ = hp.read_map(path +
                                 "/test_mapbased_param/mask_04000.fits")
             mask = hp.ud_grade(mask_, self.nside)
+            mask[(mask != 0) * (mask != 1)] = 0
             del mask_
+
             self.mask = mask
         else:
             print('Only SAT mask supported for now')
