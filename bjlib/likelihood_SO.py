@@ -172,7 +172,6 @@ class sky_map:
             components = [CMB(), Dust(sky_map.dust_freq),
                           Synchrotron(sky_map.synchrotron_freq)]
         else:
-            print('fix temp in get_A_ev')
             components = [CMB(), Dust(sky_map.dust_freq, temp=20),
                           Synchrotron(sky_map.synchrotron_freq)]
         A = MixingMatrix(*components)
