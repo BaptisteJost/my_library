@@ -135,8 +135,7 @@ def cl_rotation_derivative(cl, angle_in):
         i.e. : TT, EE, BB, TE, EB, TB
 
     """
-    print('Warning ! cl_rotation_derivative() is an outdated version, sign error may occur')
-    print('Be particularly cautious about the use of TB,TE terms')
+
     angle = angle_in.to(u.rad).value
     cl_EE_rot_da = np.sin(4 * angle) * (cl[:, 1] - cl[:, 2])
     cl_BB_rot_da = np.sin(4 * angle) * (-cl[:, 1] + cl[:, 2])
@@ -145,6 +144,9 @@ def cl_rotation_derivative(cl, angle_in):
     cl_TB_rot_da = cl[:, 3] * (-np.cos(2 * angle))
 
     if cl.shape[0] == 6:
+        print('Warning ! cl_rotation_derivative() is an outdated version, sign error may occur')
+        print('Be particularly cautious about the use of TB,TE terms')
+
         cl_EE_rot_da += cl[:, 4] * 2 * np.cos(4 * angle)
         cl_BB_rot_da -= cl[:, 4] * 2 * np.cos(4 * angle)
         cl_EB_rot_da += cl[:, 4] * 2 * np.sin(4 * angle)

@@ -344,7 +344,6 @@ def fisher_pws(cov, deriv, f_sky, ell=None, cov2=None, deriv2=None, return_eleme
     deriv = deriv.spectra[deriv1_index]
     deriv2 = deriv2.spectra[deriv2_index]
     if len(np.shape(deriv)) == 1:
-        print('coucou')
         cov_matrix_inv1 = 1/cov.spectra[cov1_index]
         cov_matrix_inv2 = 1/cov.spectra[cov2_index]
         sq_in_trace1 = cov_matrix_inv1 * deriv
@@ -353,7 +352,6 @@ def fisher_pws(cov, deriv, f_sky, ell=None, cov2=None, deriv2=None, return_eleme
         trace_fisher = in_trace
 
     else:
-        print('welcome')
         cov_matrix_inv1 = np.linalg.inv(cov.spectra[cov1_index])
 
         cov_matrix_inv2 = np.linalg.inv(cov2.spectra[cov2_index])
