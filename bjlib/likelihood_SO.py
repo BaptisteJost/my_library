@@ -15,6 +15,7 @@ from fgbuster import MixingMatrix
 from fgbuster.component_model import CMB, Dust, Synchrotron
 from scipy.linalg import block_diag
 from fgbuster.observation_helpers import get_sky
+from fgbuster.observation_helpers import get_instrument
 import pysm
 import bjlib.V3calc as V3
 # from fgbuster import visualization as visu
@@ -85,6 +86,8 @@ class sky_map:
             self.frequencies = np.array([40.0, 50.0, 60.0, 68.4, 78.0, 88.5,
                                          100.0, 118.9, 140.0, 166.0, 195.0,
                                          234.9, 280.0, 337.4, 402.1])
+        if self.instrument == 'Planck':
+            self.frequencies = get_instrument('planck_P')['frequencies']
 
     def get_freq_maps(self, output=0):
         cmb_freq_maps = self.sky.cmb(sky_map.cmb_freq) * \
@@ -189,8 +192,10 @@ class sky_map:
         self.A_ = A_
         if self.instrument == 'SAT':
             mixing_matrix = np.repeat(A_, 2, 0)
+        elif self.instrument == 'Planck':
+            mixing_matrix = np.repeat(A_, 2, 0)
         else:
-            print('Only SAT supported for mxing matrix for now')
+            print('Only SAT & Planck supported for mxing matrix for now')
 
         mixing_matrix = np.repeat(mixing_matrix, 2, 1)
 
@@ -326,35 +331,55 @@ class sky_map:
                                                       self.nside*3)[2],
                                     2, 0)
 
-            noise_covariance = np.diag(
-                (white_noise / hp.nside2resol(self.nside, arcmin=True))**2)
-            inv_noise = np.diag((hp.nside2resol(
-                self.nside, arcmin=True)/white_noise)**2)
+            # noise_covariance = np.diag(
+            #     (white_noise / hp.nside2resol(self.nside, arcmin=True))**2)
+            # inv_noise = np.diag((hp.nside2resol(
+            #     self.nside, arcmin=True)/white_noise)**2)
+            #
+            # noise_N_ell = np.repeat(
+            #     V3.so_V3_SA_noise(sensitiviy_mode, one_over_f_mode, 1, 0.1,
+            #                       self.nside*3, beam_corrected=True)[1],
+            #     2, 0)
+            # ells = np.shape(noise_N_ell)[-1]
+            # noise_cov_ell = [np.diag(noise_N_ell[:, k]) for k in range(ells)]
+            # inv_noise_cov_ell = [np.diag(1/noise_N_ell[:, k])
+            #                      for k in range(ells)]
 
-            noise_N_ell = np.repeat(
-                V3.so_V3_SA_noise(sensitiviy_mode, one_over_f_mode, 1, 0.1,
-                                  self.nside*3, beam_corrected=True)[1],
-                2, 0)
-            ells = np.shape(noise_N_ell)[-1]
-            noise_cov_ell = [np.diag(noise_N_ell[:, k]) for k in range(ells)]
-            inv_noise_cov_ell = [np.diag(1/noise_N_ell[:, k])
-                                 for k in range(ells)]
-
-        if self.instrument == 'LAT':
+        elif self.instrument == 'LAT':
             white_noise = np.repeat(V3.so_V3_LA_noise(0, 0.4, 5000)[2], 2, 0)
             noise_covariance = np.diag(
                 (white_noise / hp.nside2resol(self.nside, arcmin=True))**2)
             inv_noise = np.diag(1 / (white_noise / hp.nside2resol(
                 self.nside, arcmin=True))**2)
 
-        if self.instrument == 'LiteBIRD':
+        elif self.instrument == 'LiteBIRD':
             sensitivity = np.array([37.5, 24.0, 19.9, 16.2, 13.5, 11.7, 9.2,
                                     7.6, 5.9, 6.5, 5.8, 7.7, 13.2, 19.5, 37.5])
+        elif self.instrument == 'Planck':
+            print('Planck white noise')
+            # noise_covariance = np.eye(12)
+            # inv_noise = np.eye(12)
+
+            white_noise = np.repeat(get_instrument('planck_P')['sens_P'], 2, 0)
+
+        noise_covariance = np.diag(
+            (white_noise / hp.nside2resol(self.nside, arcmin=True))**2)
+        inv_noise = np.diag((hp.nside2resol(
+            self.nside, arcmin=True)/white_noise)**2)
+
+        # noise_N_ell = np.repeat(
+        #     V3.so_V3_SA_noise(sensitiviy_mode, one_over_f_mode, 1, 0.1,
+        #                       self.nside*3, beam_corrected=True)[1],
+        #     2, 0)
+        # ells = np.shape(noise_N_ell)[-1]
+        # noise_cov_ell = [np.diag(noise_N_ell[:, k]) for k in range(ells)]
+        # inv_noise_cov_ell = [np.diag(1/noise_N_ell[:, k])
+        #                      for k in range(ells)]
 
         self.noise_covariance = noise_covariance
         self.inv_noise = inv_noise
-        self.noise_cov_ell = noise_cov_ell
-        self.inv_noise_ell = inv_noise_cov_ell
+        # self.noise_cov_ell = noise_cov_ell
+        # self.inv_noise_ell = inv_noise_cov_ell
 
     def prim_rotation(self):
         cl_rot = lib.cl_rotation(self.prim, self.bir_angle)
@@ -450,8 +475,17 @@ class sky_map:
             del mask_
 
             self.mask = mask
+        if self.instrument == 'Planck':
+            print('importing Planck 60% HFI mask')
+            mask_ = hp.read_map('data/'+'HFI_Mask_GalPlane-apo0_2048_R2.00.fits', 2)
+
+            mask = hp.ud_grade(mask_, self.nside)
+            mask[(mask != 0) * (mask != 1)] = 0
+            del mask_
+
+            self.mask = mask
         else:
-            print('Only SAT mask supported for now')
+            print('Only SAT & Planck mask supported for now')
 
 
 def get_chi_squared(angle_array, data_skm, model_skm, prior=False):
