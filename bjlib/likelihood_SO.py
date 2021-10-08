@@ -149,7 +149,7 @@ class sky_map:
                                 self.dust_freq_maps[start_spectra:], 0)
             signal = np.append(signal_, self.sync_freq_maps[start_spectra:], 0)
             del signal_
-
+            del self.cmb_freq_rot
             print('Signal with cmb rotation')
 
         elif hasattr(self, 'cmb_faraday'):
@@ -157,6 +157,7 @@ class sky_map:
                                 self.dust_freq_maps[start_spectra:], 0)
             signal = np.append(signal_, self.sync_freq_maps[start_spectra:], 0)
             del signal_
+            del self.cmb_faraday
             print('Signal with Faraday rotation')
 
         else:
@@ -164,7 +165,9 @@ class sky_map:
                                 self.dust_freq_maps[start_spectra:], 0)
             signal = np.append(signal_, self.sync_freq_maps[start_spectra:], 0)
             print('Signal with no rotation')
-
+            del self.cmb_freq_maps
+        del self.dust_freq_maps
+        del self.sync_freq_maps
         self.signal = signal
         if output:
             return signal
