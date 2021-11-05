@@ -99,6 +99,8 @@ class sky_map:
         self.cmb_freq_maps = cmb_freq_maps
         self.dust_freq_maps = dust_freq_maps
         self.sync_freq_maps = sync_freq_maps
+        del self.sky
+
         if output:
             return cmb_freq_maps, dust_freq_maps, sync_freq_maps
 
@@ -478,7 +480,7 @@ class sky_map:
             del mask_
 
             self.mask = mask
-        if self.instrument == 'Planck':
+        elif self.instrument == 'Planck':
             print('importing Planck 60% HFI mask')
             mask_ = hp.read_map('data/'+'HFI_Mask_GalPlane-apo0_2048_R2.00.fits', 2)
 
