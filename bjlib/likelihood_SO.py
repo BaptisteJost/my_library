@@ -187,7 +187,7 @@ class sky_map:
         A_ev = A.evaluator(self.frequencies)
         self.A_ev = A_ev
 
-    def evaluate_mixing_matrix(self, spectral_indices=[1.59, 20, -3]):
+    def evaluate_mixing_matrix(self, spectral_indices=[1.54, 20, -3]):
         if not self.fix_temp:
             self.spectral_indices = spectral_indices
         else:

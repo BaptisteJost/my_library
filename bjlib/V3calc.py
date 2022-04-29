@@ -282,6 +282,12 @@ def so_V3_SA_noise(sensitivity_mode, one_over_f_mode, SAC_yrs_LF, f_sky, ell_max
     N_ell_P_225 = (W_T_225 * np.sqrt(2))**2. * A_SR * AN_P_225
     N_ell_P_280 = (W_T_280 * np.sqrt(2))**2. * A_SR * AN_P_280
 
+    N_ell_P_27_no_ell = (W_T_27 * np.sqrt(2))**2. * A_SR
+    N_ell_P_39_no_ell = (W_T_39 * np.sqrt(2))**2. * A_SR
+    N_ell_P_93_no_ell = (W_T_93 * np.sqrt(2))**2. * A_SR
+    N_ell_P_145_no_ell = (W_T_145 * np.sqrt(2))**2. * A_SR
+    N_ell_P_225_no_ell = (W_T_225 * np.sqrt(2))**2. * A_SR
+    N_ell_P_280_no_ell = (W_T_280 * np.sqrt(2))**2. * A_SR
     # include the imapct of the beam
     SA_beams = so_V3_SA_beams() / np.sqrt(8. * np.log(2)) / 60. * np.pi/180.
     # lac beams as a sigma expressed in radians
@@ -296,6 +302,8 @@ def so_V3_SA_noise(sensitivity_mode, one_over_f_mode, SAC_yrs_LF, f_sky, ell_max
     # make an array of nosie curves for T
     N_ell_P_SA = np.array([N_ell_P_27, N_ell_P_39, N_ell_P_93,
                            N_ell_P_145, N_ell_P_225, N_ell_P_280])
-
+    ell_shape = np.ones(ell.shape[0])
+    N_ell_white_noise = np.array([ell_shape*N_ell_P_27_no_ell, ell_shape*N_ell_P_39_no_ell, ell_shape*N_ell_P_93_no_ell,
+                                  ell_shape*N_ell_P_145_no_ell, ell_shape*N_ell_P_225_no_ell, ell_shape * N_ell_P_280_no_ell])
     ####################################################################
-    return(ell, N_ell_P_SA, Map_white_noise_levels)
+    return(ell, N_ell_P_SA, Map_white_noise_levels, N_ell_white_noise)
