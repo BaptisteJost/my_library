@@ -83,9 +83,15 @@ class sky_map:
             self.frequencies = V3.so_V3_LA_bands()
         if self.instrument == 'LiteBIRD':
             print(self.instrument)
-            self.frequencies = np.array([40.0, 50.0, 60.0, 68.4, 78.0, 88.5,
-                                         100.0, 118.9, 140.0, 166.0, 195.0,
-                                         234.9, 280.0, 337.4, 402.1])
+            instrument_LB = np.load('data/instrument_LB_IMOv1.npy', allow_pickle=True).item()
+            instr_ = {}
+            instr_['frequency'] = np.array([instrument_LB[f]['freq'] for f in instrument_LB.keys()])
+            instr_['depth_p'] = np.array([instrument_LB[f]['P_sens'] for f in instrument_LB.keys()])
+            instr_['fwhm'] = np.array([instrument_LB[f]['beam'] for f in instrument_LB.keys()])
+            instr_['depth_i'] = instr_['depth_p'] / np.sqrt(2)
+            self.frequencies = instr_['frequency']
+            self.sensitivity_LB = instr_['depth_p']
+
         if self.instrument == 'Planck':
             self.frequencies = get_instrument('planck_P')['frequencies']
 
@@ -199,8 +205,10 @@ class sky_map:
             mixing_matrix = np.repeat(A_, 2, 0)
         elif self.instrument == 'Planck':
             mixing_matrix = np.repeat(A_, 2, 0)
+        elif self.instrument == 'LiteBIRD':
+            mixing_matrix = np.repeat(A_, 2, 0)
         else:
-            print('Only SAT & Planck supported for mxing matrix for now')
+            print('Only SAT Planck and LiteBIRD supported for mxing matrix for now')
 
         mixing_matrix = np.repeat(mixing_matrix, 2, 1)
 
@@ -358,8 +366,10 @@ class sky_map:
                 self.nside, arcmin=True))**2)
 
         elif self.instrument == 'LiteBIRD':
-            sensitivity = np.array([37.5, 24.0, 19.9, 16.2, 13.5, 11.7, 9.2,
-                                    7.6, 5.9, 6.5, 5.8, 7.7, 13.2, 19.5, 37.5])
+            # sensitivity = np.array([37.5, 24.0, 19.9, 16.2, 13.5, 11.7, 9.2,
+            # 7.6, 5.9, 6.5, 5.8, 7.7, 13.2, 19.5, 37.5])
+            white_noise = np.repeat(self.sensitivity_LB, 2, 0)
+
         elif self.instrument == 'Planck':
             print('Planck white noise')
             # noise_covariance = np.eye(12)
@@ -489,8 +499,17 @@ class sky_map:
             del mask_
 
             self.mask = mask
+        elif self.instrument == 'LiteBIRD':
+            print('importing LB mask 49%')
+            mask_ = hp.read_map('data/'+'mask_LB.fits')
+            mask = hp.ud_grade(mask_, self.nside)
+            mask[(mask != 0) * (mask != 1)] = 0
+            del mask_
+
+            self.mask = mask
+
         else:
-            print('Only SAT & Planck mask supported for now')
+            print('Only SAT, Planck and LiteBIRD mask supported for now')
 
 
 def get_chi_squared(angle_array, data_skm, model_skm, prior=False):
