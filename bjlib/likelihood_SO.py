@@ -83,7 +83,13 @@ class sky_map:
             self.frequencies = V3.so_V3_LA_bands()
         if self.instrument == 'LiteBIRD':
             print(self.instrument)
-            instrument_LB = np.load('data/instrument_LB_IMOv1.npy', allow_pickle=True).item()
+            if machine == 'NERSC':
+                pixel_path = '/global/u2/j/jost/these/pixel_based_analysis/code/'
+            elif machine == 'local':
+                pixel_path = '/home/baptiste/Documents/these/pixel_based_analysis/'
+
+            instrument_LB = np.load(pixel_path+'data/instrument_LB_IMOv1.npy',
+                                    allow_pickle=True).item()
             instr_ = {}
             instr_['frequency'] = np.array([instrument_LB[f]['freq'] for f in instrument_LB.keys()])
             instr_['depth_p'] = np.array([instrument_LB[f]['P_sens'] for f in instrument_LB.keys()])
@@ -492,7 +498,8 @@ class sky_map:
             self.mask = mask
         elif self.instrument == 'Planck':
             print('importing Planck 60% HFI mask')
-            mask_ = hp.read_map('data/'+'HFI_Mask_GalPlane-apo0_2048_R2.00.fits', 2)
+
+            mask_ = hp.read_map(pixel_path+'data/'+'HFI_Mask_GalPlane-apo0_2048_R2.00.fits', 2)
 
             mask = hp.ud_grade(mask_, self.nside)
             mask[(mask != 0) * (mask != 1)] = 0
@@ -501,7 +508,8 @@ class sky_map:
             self.mask = mask
         elif self.instrument == 'LiteBIRD':
             print('importing LB mask 49%')
-            mask_ = hp.read_map('data/'+'mask_LB.fits')
+            pixel_path = '/global/u2/j/jost/these/pixel_based_analysis/code/'
+            mask_ = hp.read_map(pixel_path+'data/'+'mask_LB.fits')
             mask = hp.ud_grade(mask_, self.nside)
             mask[(mask != 0) * (mask != 1)] = 0
             del mask_

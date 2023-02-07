@@ -1,12 +1,12 @@
 
 import numpy as np
 import healpy as hp
-import camb
+#import camb
 from astropy import units as u
 import pysm
 import copy
-from fgbuster import MixingMatrix
-from fgbuster.component_model import CMB, Dust, Synchrotron
+#from fgbuster import MixingMatrix
+#from fgbuster.component_model import CMB, Dust, Synchrotron
 from . import V3calc as V3
 
 
