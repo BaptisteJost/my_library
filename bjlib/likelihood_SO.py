@@ -83,13 +83,21 @@ class sky_map:
             self.frequencies = V3.so_V3_LA_bands()
         if self.instrument == 'LiteBIRD':
             print(self.instrument)
-            if machine == 'NERSC':
-                pixel_path = '/global/u2/j/jost/these/pixel_based_analysis/code/'
-            elif machine == 'local':
-                pixel_path = '/home/baptiste/Documents/these/pixel_based_analysis/'
-
-            instrument_LB = np.load(pixel_path+'data/instrument_LB_IMOv1.npy',
-                                    allow_pickle=True).item()
+            import os
+            pixel_path_NERSC = '/global/u2/j/jost/these/pixel_based_analysis/code/'
+            pixel_path_local = '/home/baptiste/Documents/these/pixel_based_analysis/'
+            pixel_path_idark = '/home/jost/code/pixel_based_analysis/'
+            if os.path.exists(pixel_path_NERSC):
+                instrument_LB = np.load(pixel_path_NERSC+'data/instrument_LB_IMOv1.npy',
+                                        allow_pickle=True).item()
+            elif os.path.exists(pixel_path_local):
+                instrument_LB = np.load(pixel_path_local+'code/data/instrument_LB_IMOv1.npy',
+                                        allow_pickle=True).item()
+            elif os.path.exists(pixel_path_idark):
+                instrument_LB = np.loaf(pixel_path_idark+'code/data/instrument_LB_IMOv1.npy',
+                                        allow_pickle=True).item()
+            else:
+                print('ERROR in likelihood_SO.get_frequency(): pixel path not specified for this machine ')
             instr_ = {}
             instr_['frequency'] = np.array([instrument_LB[f]['freq'] for f in instrument_LB.keys()])
             instr_['depth_p'] = np.array([instrument_LB[f]['P_sens'] for f in instrument_LB.keys()])
