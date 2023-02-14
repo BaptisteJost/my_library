@@ -94,7 +94,7 @@ class sky_map:
                 instrument_LB = np.load(pixel_path_local+'code/data/instrument_LB_IMOv1.npy',
                                         allow_pickle=True).item()
             elif os.path.exists(pixel_path_idark):
-                instrument_LB = np.loaf(pixel_path_idark+'code/data/instrument_LB_IMOv1.npy',
+                instrument_LB = np.load(pixel_path_idark+'code/data/instrument_LB_IMOv1.npy',
                                         allow_pickle=True).item()
             else:
                 print('ERROR in likelihood_SO.get_frequency(): pixel path not specified for this machine ')
