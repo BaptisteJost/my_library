@@ -287,15 +287,10 @@ class sky_map:
         frequencies_by_instrument = self.frequencies_by_instrument
         # TODO:  freq by instrument should be SAT or LAT property and class
         # attribute
-        print('====================================================')
-        print(len(miscal_angles))
-        print(len(frequencies_by_instrument))
-        print(sum(frequencies_by_instrument))
-        print(len(self.frequencies))
         try:
             if len(miscal_angles) != len(frequencies_by_instrument) or \
                     sum(frequencies_by_instrument) != len(self.frequencies):
-                print('WARNING: miscalibration angles doesnt match the number',
+                print('ERROR: miscalibration angles doesnt match the number',
                       'of instrument\n ',
                       'or the number of frequencies by instrument doesnt match'
                       ' the number of frequencies')
