@@ -180,7 +180,7 @@ def so_V3_SA_beams():
 
 
 def so_V3_SA_noise(sensitivity_mode, one_over_f_mode, SAC_yrs_LF, f_sky, ell_max, delta_ell=1,
-                   beam_corrected=False, remove_kluge=False):
+                   beam_corrected=False, remove_kluge=False, t_obs_years=5):
     # retuns noise curves, including the impact of the beam for the SO small aperature telescopes
     # noise curves are polarization only
     # sensitivity_mode
@@ -201,11 +201,12 @@ def so_V3_SA_noise(sensitivity_mode, one_over_f_mode, SAC_yrs_LF, f_sky, ell_max
     # SMALL APERATURE
     # LARGE APERATURE
     # configuraiton
+    # SAC_yrs_LF = 0; print('WARNING: SAC_yrs_LF fixed to 0 for testing!! (V3Calc)')
     if (SAC_yrs_LF > 0):
-        NTubes_LF = SAC_yrs_LF/5. + 1e-6  # reguarlized in case zero years is called
-        NTubes_MF = 2 - SAC_yrs_LF/5.
+        NTubes_LF = SAC_yrs_LF/t_obs_years + 1e-6  # reguarlized in case zero years is called
+        NTubes_MF = 2 - SAC_yrs_LF/t_obs_years
     else:
-        NTubes_LF = -SAC_yrs_LF/5. + 1e-6  # reguarlized in case zero years is called
+        NTubes_LF = -SAC_yrs_LF/t_obs_years + 1e-6  # reguarlized in case zero years is called
         NTubes_MF = 2
     NTubes_UHF = 1.
     # sensitivity
@@ -228,7 +229,7 @@ def so_V3_SA_noise(sensitivity_mode, one_over_f_mode, SAC_yrs_LF, f_sky, ell_max
 
     ####################################################################
     # calculate the survey area and time
-    t = 5 * 365. * 24. * 3600  # five years in seconds
+    t = t_obs_years * 365. * 24. * 3600  # five years in seconds
     t = t * 0.2  # retention after observing efficiency and cuts
     if remove_kluge == False:
         t = t * 0.85  # a kluge for the noise non-uniformity of the map edges

@@ -30,7 +30,7 @@ class sky_map:
     def __init__(self, nside=128, instrument='SAT', sky_model='c1s0d0',
                  bir_angle=0.0*u.rad,
                  frequencies_by_instrument=[2, 2, 2],
-                 miscal_angles=[0.2, 0.0, 0.0]*u.rad):
+                 miscal_angles=[0.2, 0.0, 0.0]*u.rad, SAC_yrs_LF=0):
         # [0.00575959, -0.00575959,  0.00287979]*u.rad):
         # [0.33, -0.33, 0.33/2] * u.deg):
 
@@ -41,6 +41,7 @@ class sky_map:
         # self._cal_angle = cal_angle
         self.frequencies_by_instrument = frequencies_by_instrument
         self.miscal_angles = miscal_angles
+        self.SAC_yrs_LF = SAC_yrs_LF
 
     def _get_nside(self):
         return self._nside
@@ -108,6 +109,19 @@ class sky_map:
 
         if self.instrument == 'Planck':
             self.frequencies = get_instrument('planck_P')['frequencies']
+
+        if self.instrument == 'SAT+Planck':
+            Pl_freq = np.array([30, 44, 70, 100, 143, 217, 353])  # in GHz, from cmbdb
+            frequencies = np.array([27,  39,  93, 145, 225, 280])
+            frequencies = np.append(frequencies, Pl_freq)
+            if self.SAC_yrs_LF == 0:
+                frequencies = frequencies[2:]
+            self.frequencies = frequencies
+
+            # in muK - arcmin, from cmbdb
+            self.planck_sens_p = np.array([3.5, 4.0, 5.0, 1.96, 1.17, 1.75, 7.31])*60.0
+            self.planck_beams = np.array(
+                [32.29, 27.94, 13.08, 9.66, 7.22, 4.90, 4.92])  # in arcmin, from cmbdb
 
     def get_freq_maps(self, output=0):
         cmb_freq_maps = self.sky.cmb(sky_map.cmb_freq) * \
@@ -218,6 +232,8 @@ class sky_map:
         if self.instrument == 'SAT':
             mixing_matrix = np.repeat(A_, 2, 0)
         elif self.instrument == 'Planck':
+            mixing_matrix = np.repeat(A_, 2, 0)
+        elif self.instrument == 'SAT+Planck':
             mixing_matrix = np.repeat(A_, 2, 0)
         elif self.instrument == 'LiteBIRD':
             mixing_matrix = np.repeat(A_, 2, 0)
@@ -348,14 +364,14 @@ class sky_map:
                                                lens_potential=False, ratio=0)
         self.prim = powers['total'][:self.nside*3]
 
-    def get_noise(self, sensitiviy_mode=2, one_over_f_mode=2):
+    def get_noise(self, sensitiviy_mode=2, one_over_f_mode=2, t_obs_years=5, SAC_yrs_LF=1):
         # TODO: put SAT and LAT caracteristics in class atributes
         if self.instrument == 'SAT':
             print('SAT white noise')
             # noise_covariance = np.eye(12)
             # inv_noise = np.eye(12)
-            white_noise = np.repeat(V3.so_V3_SA_noise(sensitiviy_mode, one_over_f_mode, 1, 0.1,
-                                                      self.nside*3)[2],
+            white_noise = np.repeat(V3.so_V3_SA_noise(sensitiviy_mode, one_over_f_mode, SAC_yrs_LF, 0.1,
+                                                      self.nside*3, t_obs_years=t_obs_years)[2],
                                     2, 0)
 
             # noise_covariance = np.diag(
@@ -388,8 +404,30 @@ class sky_map:
             print('Planck white noise')
             # noise_covariance = np.eye(12)
             # inv_noise = np.eye(12)
-
+            # TODO: CHECK UNITS!
             white_noise = np.repeat(get_instrument('planck_P')['sens_P'], 2, 0)
+
+        elif self.instrument == 'SAT+Planck':
+            print('SAT+Planck white noise')
+            planck_noise_lvl = self.planck_sens_p  # in uk-arcmin
+            # as it is the sensitivity for polarisation already, no sqrt(2) factor needed
+            planck_noise_lvl *= np.pi / 180 / 60  # from arcmin to rad
+            # rescaling to match SO sky fraction
+            f_sky_planck = 1  # with what fsky were the noise lvl computed ?
+            fsky = 0.1
+            planck_noise_lvl *= np.sqrt(fsky) / np.sqrt(f_sky_planck)
+            white_noise_Planck = np.repeat(planck_noise_lvl, 2, 0)
+
+            white_noise_SAT = np.repeat(V3.so_V3_SA_noise(sensitiviy_mode, one_over_f_mode, SAC_yrs_LF, 0.1,
+                                                          self.nside*3, t_obs_years=t_obs_years)[2],
+                                        2, 0)
+
+            if SAC_yrs_LF == 0:
+                # remove 2 first frequencies as LF i off, here 4 because of repetition
+                white_noise = np.append(white_noise_SAT[4:], white_noise_Planck)
+
+            else:
+                white_noise = np.append(white_noise_SAT, white_noise_Planck)
 
         noise_covariance = np.diag(
             (white_noise / hp.nside2resol(self.nside, arcmin=True))**2)
@@ -492,7 +530,7 @@ class sky_map:
         self.projection = projection
 
     def get_mask(self, path='/global/homes/j/jost/BBPipe'):
-        if self.instrument == 'SAT':
+        if self.instrument == 'SAT' or self.instrument == 'SAT+Planck':
             # BBPipe_path = '/global/homes/j/jost/BBPipe'
             # BBPipe_path = '/home/baptiste/BBPipe'
             # mask_ = hp.read_map(path +
