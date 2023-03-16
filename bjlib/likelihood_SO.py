@@ -412,16 +412,16 @@ class sky_map:
             print('SAT+Planck white noise')
             planck_noise_lvl = copy.deepcopy(self.planck_sens_p)  # in uk-arcmin
             # as it is the sensitivity for polarisation already, no sqrt(2) factor needed
-            planck_noise_lvl *= np.pi / 180 / 60  # from arcmin to rad
+            # planck_noise_lvl *= np.pi / 180 / 60  # from arcmin to rad
             # rescaling to match SO sky fraction
             f_sky_planck = 1  # with what fsky were the noise lvl computed ?
             fsky = 0.1
             planck_noise_lvl *= np.sqrt(fsky) / np.sqrt(f_sky_planck)
             white_noise_Planck = np.repeat(planck_noise_lvl, 2, 0)
 
-            white_noise_SAT = np.repeat(V3.so_V3_SA_noise(sensitiviy_mode, one_over_f_mode, SAC_yrs_LF, 0.1,
-                                                          self.nside*3, t_obs_years=t_obs_years)[2],
-                                        2, 0)
+            white_noise_SAT = np.repeat(
+                V3.so_V3_SA_noise(sensitiviy_mode, one_over_f_mode, SAC_yrs_LF,
+                                  0.1, self.nside*3, t_obs_years=t_obs_years)[2], 2, 0)
 
             if SAC_yrs_LF == 0:
                 # remove 2 first frequencies as LF i off, here 4 because of repetition
