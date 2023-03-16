@@ -18,6 +18,7 @@ from fgbuster.observation_helpers import get_sky
 from fgbuster.observation_helpers import get_instrument
 import pysm
 import bjlib.V3calc as V3
+import copy
 # from fgbuster import visualization as visu
 
 
@@ -409,7 +410,7 @@ class sky_map:
 
         elif self.instrument == 'SAT+Planck':
             print('SAT+Planck white noise')
-            planck_noise_lvl = self.planck_sens_p  # in uk-arcmin
+            planck_noise_lvl = copy.deepcopy(self.planck_sens_p)  # in uk-arcmin
             # as it is the sensitivity for polarisation already, no sqrt(2) factor needed
             planck_noise_lvl *= np.pi / 180 / 60  # from arcmin to rad
             # rescaling to match SO sky fraction
